@@ -1,6 +1,6 @@
 # Docker tutorial
 
-## Installation on Ubuntu server
+## Installation on a Ubuntu server
 
 Install required packages with `apt-get`:
 
