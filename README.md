@@ -9,9 +9,8 @@
 * [git](git/git_tutorial.md)
 * [Docker](docker/docker_ubuntu_tutorial.md)
 
-**Kubernetes**
+**Kubernetes (the K3s-distribution)**
 
-* [Kubernetes](kubernetes/kubernetes_tutorial.md)
 * [K3s on vagrant](kubernetes/k3s_vagrant_tutorial.md)
 * [K3s on Ubuntu server with PiHole](kubernetes/k3s_ubuntu_pihole_tutorial.md)
 * [Kubernetes troubleshooting](kubernetes/troubleshooting.md)
