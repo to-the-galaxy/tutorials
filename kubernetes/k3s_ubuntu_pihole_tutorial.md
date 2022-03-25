@@ -33,7 +33,7 @@ $ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.100.101 --f
 
 To install K3s worker nodes (refered to just as "worker").
 
-```bash
+``` bash
 # Get K3s-token
 [server] $ sudo cat /var/lib/rancher/k3s/server/node-token
 
