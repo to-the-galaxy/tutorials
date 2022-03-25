@@ -129,11 +129,32 @@ Create secret from the auth-file:
 kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
 ```
 
-Create an ingress for Longhorn:
+Create an ingress yaml-file for Longhorn:
 
 ```
 $ cat > longhorn-ingress.yaml <<EOL
-[!longhorn-ingress.yaml[l](source/longhorn-ingress.yaml)]
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: longhorn-ingress
+  namespace: longhorn-system
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required '
+    nginx.ingress.kubernetes.io/proxy-body-size: 10000m
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: longhorn-frontend
+            port:
+              number: 80
 EOL
 ```
 
