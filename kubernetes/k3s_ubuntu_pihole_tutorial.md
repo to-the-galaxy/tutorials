@@ -14,7 +14,7 @@ Install K3s on the master node.
 On **server**, get ip-address and network adapter:
 
 ```bash
-$ ip addr
+ip addr
 ```
 
 Output extract:
@@ -28,37 +28,37 @@ Output extract:
 On **server**, use the ip-address (192.168.100.101) and network adapter (ens19) in the install script:
 
 ```
-$ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.100.101 --flannel-iface=ens18 --write-kubeconfig-mode=644" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.100.101 --flannel-iface=ens18 --write-kubeconfig-mode=644" sh -
 ```
 
 To install K3s worker nodes (refered to just as "worker"), obtain first a node-token on the master node. On **server**:
 
 ```bash
-$ sudo cat /var/lib/rancher/k3s/server/node-token
+sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 
 Now, log on the worker node and obtain its ip-address and network adapter:
 
 ```bash
-$ ip addr
+ip addr
 ```
 
 Now use the node-token from the master, and the ip-address and network adapter from the worker node:
 
 ```bash
-$ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=<ip-addr-of-worker-node> --flannel-iface=eth1" K3S_URL=https://<ip-addr-of-master-node>:6443 K3S_TOKEN=<insert-node-token-from-master-node>  sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=<ip-addr-of-worker-node> --flannel-iface=eth1" K3S_URL=https://<ip-addr-of-master-node>:6443 K3S_TOKEN=<insert-node-token-from-master-node>  sh -
 ```
 
 To check the network connection from the master to the work nodes, _which may take time before they are provisioned_, log on the **server** and ping the worker:
 
 ```bash
-$ ping <ip-addr-of-worker-node>
+ping <ip-addr-of-worker-node>
 ```
 
 Check that the worker nodes are in the cluster by running a `kubectl get nodes` from the **server** (master node):
 
 ```bash
-$ kubectl get nodes --watch
+kubectl get nodes --watch
 ```
 
 ## Configuring `kubectl` 
