@@ -11,7 +11,7 @@
 
 Install K3s on the master node.
 
-On **server**, get ip-address and network adapter
+On **server**, get ip-address and network adapter:
 
 ```bash
 $ ip addr
@@ -25,32 +25,40 @@ Output extract:
     inet 192.168.100.101/24 brd 192.168.100.255 scope global dynamic ens18
 ```
 
-On **server**, use the ip-address (192.168.100.101) and network adapter (ens19) in the install script
+On **server**, use the ip-address (192.168.100.101) and network adapter (ens19) in the install script:
 
 ```
 $ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.100.101 --flannel-iface=ens18 --write-kubeconfig-mode=644" sh -
 ```
 
-To install K3s worker nodes (refered to just as "worker").
+To install K3s worker nodes (refered to just as "worker"), obtain first a node-token on the master node. On **server**:
 
-``` bash
-# Get K3s-token
-[server] $ sudo cat /var/lib/rancher/k3s/server/node-token
+```bash
+$ sudo cat /var/lib/rancher/k3s/server/node-token
+```
 
-# Log on the worker node and get ip and ethernet adapter
-[worker] $ ip addr
+Now, log on the worker node and obtain its ip-address and network adapter:
 
-# Use token in command for the worker node 1:
-[worker] $ ip addr
+```bash
+$ ip addr
+```
 
-# Use information in this script
-[worker] $ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=<ip-addr-of-worker-node> --flannel-iface=eth1" K3S_URL=https://<ip-addr-of-master-node>:6443 K3S_TOKEN=<insert-node-token-from-master-node>  sh -
+Now use the node-token from the master, and the ip-address and network adapter from the worker node:
 
-# Check the network connection from the master to the work nodes (it may take time before they are provisioned)
-[server] $ ping <ip-addr-of-worker-node>
+```bash
+$ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=<ip-addr-of-worker-node> --flannel-iface=eth1" K3S_URL=https://<ip-addr-of-master-node>:6443 K3S_TOKEN=<insert-node-token-from-master-node>  sh -
+```
 
-# Check that the worker nodes are in the cluster
-[server] $ kubectl get nodes --watch
+To check the network connection from the master to the work nodes, _which may take time before they are provisioned_, log on the **server** and ping the worker:
+
+```bash
+$ ping <ip-addr-of-worker-node>
+```
+
+Check that the worker nodes are in the cluster by running a `kubectl get nodes` from the **server** (master node):
+
+```bash
+$ kubectl get nodes --watch
 ```
 
 ## Configuring `kubectl` 
