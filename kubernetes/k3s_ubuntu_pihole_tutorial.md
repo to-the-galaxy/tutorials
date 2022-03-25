@@ -11,17 +11,24 @@
 
 Install K3s on the master node.
 
+On **server**, get ip-address and network adapter
+
 ```bash
-# Get ip-address and network
-[server] $ ip addr
-# Output (extract)
-...
+$ ip addr
+```
+
+Output extract:
+
+```
 2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
     link/ether ... brd ...
     inet 192.168.100.101/24 brd 192.168.100.255 scope global dynamic ens18
-...
-# Use 192.168.100.101 and ens19 in the install script
-[server] $ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.100.101 --flannel-iface=ens18 --write-kubeconfig-mode=644" sh -
+```
+
+On **server**, use the ip-address (192.168.100.101) and network adapter (ens19) in the install script
+
+```
+$ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.100.101 --flannel-iface=ens18 --write-kubeconfig-mode=644" sh -
 ```
 
 To install K3s worker nodes (refered to just as "worker").
