@@ -172,9 +172,10 @@ curl <ip-of-master-node>:80
 
 ## Pihole-installation
 
+Creat installation yaml-file (reqires Longhorn and K3s and maybe Traefik):
+
 ```bash
-# Creat installation yaml-file (reqires Longhorn and K3s and maybe Traefik)
-$ cat > pihole-setup.yaml <<EOL
+cat > pihole-setup.yaml <<EOL
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
@@ -380,20 +381,31 @@ status:
     ingress:
     - ip: 192.168.100.101
 EOL
-# Apply pihole-setup.yaml
-$ kubectl apply -f pihole-setup.yaml
-# Check that a persistent volumn has been created using the web browser on 192.168.56.100:8000
 ```
 
-Now reset Pihole password:
+Apply pihole-setup.yaml
+
+```
+kubectl apply -f pihole-setup.yaml
+```
+
+Check that a persistent volumn has been created using the web browser on 192.168.56.100:8000
+
+Now reset Pihole password. To do this get the full name of a PiHole-pod (in this case it is pihole-5647ddfb87-l7p9r), then use it to access the pod with `kubectl exec` and run the command to set the pihole password:
+
+First get the name of the Pihole pod:
+```bash
+kubectl get pods
+```
+
+Log on the pod:
 
 ```bash
-# Get pod id for the PiHole
-$ kubectl get pods
-# Log on the pod
-$ kubectl exec -it pihole-5647ddfb87-l7p9r -- bash
-[pod] $ sudo pihole -a -p
-# Follow the instructions
-# Exit the pod
-[pod] $ exit
+kubectl exec -it <name-of-pihole-pod> -- bash
+```
+
+Run this command and follow the guide to change the password, while in the pod shell:
+
+```bash
+$ sudo pihole -a -p
 ```
