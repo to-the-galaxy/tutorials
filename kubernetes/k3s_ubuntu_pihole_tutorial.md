@@ -69,74 +69,84 @@ kubectl get nodes --watch
 
 It is very convenient to configure `kubectl` to work on a client or host machine. In this case the cluster is running on a server (a small desktop pc), and the client is a laptop.
 
+First, on the **server** get the configruation key
+
 ```bash
-# Get the configruation from the master node
-[server] $ sudo cat /etc/rancher/k3s/k3s.yaml
+sudo cat /etc/rancher/k3s/k3s.yaml
+```
 
-# Copy past the content to ~/.kube/config
-[laptop] $ mkdir ~/.kube
-[laptop] $ vim ~/.kube/config
+Copy the content of `k3s.yaml` and append it to ~/.kube/config on your client (you may need to create the folder first):
 
-# Alternatively, after copying (appending) the content of k3s.yaml to ~/.kube/config change the pasted occurances of default to a different name, for example cassiniconfig. This way you can configure Kubectl to manage multiple different clusters.
+```bash
+vim ~/.kube/config
+```
 
-# Now selete the cassiniconfig
-[laptop] $ kubectl config use-context cassiniconfig
+Alternatively, after copying (appending) the content of k3s.yaml to ~/.kube/config change - in the just pasted text - the occurances of `default` to a different name, for example `cassiniconfig`. This way you can configure Kubectl to manage multiple different clusters.
 
-# Check that the nodes can be reached
-[laptop] $ kubectl get nodes
+Now selete the cassiniconfig context for Kubectl:
+
+```bash
+kubectl config use-context cassiniconfig
+```
+
+Check that the nodes can be reached:
+
+```bash
+kubectl get nodes
 ```
 
 ## Setup persistent storage with Longhorn
 
 The following commands can be executed on the **laptop** or directly on the **server**. I have chosen to use the laptop so that the yaml-files that will be generated are stored on it and can be copied easily to other projects.
 
+Install Longhorn using the official script (here version 1.2.3):
+
 ```bash
-# Install Longhorn using the official script
-$ kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.2.3/deploy/longhorn.yaml
+kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.2.3/deploy/longhorn.yaml
+```
 
-# Check status of pods being created and run
+Check status of pods being created and run:
+
+```
 $ kubectl get pods --namespace longhorn-system --watch
+```
 
-# Check status of services
+Check status of services:
+
+```
 $ kubectl -n longhorn-system get svc
+```
 
-# Create authentication-file called auth (no extension)
-$ USER=michael; PASSWORD=michael; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> auth
+Create authentication-file called auth (no extension):
 
-# Create secret from the auth-file
-$ kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
+```
+USER=<user-name>; PASSWORD=<password-of-user>; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> auth
+```
 
-# Create an ingress for Longhorn
+Create secret from the auth-file:
+
+```
+kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
+```
+
+Create an ingress for Longhorn:
+
+```
 $ cat > longhorn-ingress.yaml <<EOL
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: longhorn-ingress
-  namespace: longhorn-system
-  annotations:
-    nginx.ingress.kubernetes.io/auth-type: basic
-    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
-    nginx.ingress.kubernetes.io/auth-secret: basic-auth
-    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required '
-    nginx.ingress.kubernetes.io/proxy-body-size: 10000m
-spec:
-  rules:
-  - http:
-      paths:  ### <===== Is it necessary with a path here?
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: longhorn-frontend
-            port:
-              number: 80
+@@include[longhorn-ingress.yaml](source/longhorn-ingress.yaml)
 EOL
+```
 
-# Apply the ingress
-$ kubectl -n longhorn-system apply -f longhorn-ingress.yaml
+Apply the ingress:
 
-# Test that Longhorn is running
-$ curl <ip-of-master-node>:80
+```bash
+kubectl -n longhorn-system apply -f longhorn-ingress.yaml
+```
+
+Test that Longhorn is running
+
+```
+curl <ip-of-master-node>:80
 ```
 
 ## Pihole-installation
