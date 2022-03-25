@@ -133,7 +133,7 @@ Create an ingress for Longhorn:
 
 ```
 $ cat > longhorn-ingress.yaml <<EOL
-@@include[longhorn-ingress.yaml](source/longhorn-ingress.yaml)
+[!longhorn-ingress.yaml[l](source/longhorn-ingress.yaml)]
 EOL
 ```
 
