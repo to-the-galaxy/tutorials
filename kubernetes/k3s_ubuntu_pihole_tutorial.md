@@ -9,6 +9,8 @@
 
 ## Install K3s
 
+### Master node
+
 Install K3s on the master node.
 
 On **server**, get ip-address and network adapter:
@@ -30,6 +32,8 @@ On **server**, use the ip-address (192.168.100.101) and network adapter (ens19) 
 ```
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.100.101 --flannel-iface=ens18 --write-kubeconfig-mode=644" sh -
 ```
+
+### Worker nodes
 
 To install K3s worker nodes (refered to just as "worker"), obtain first a node-token on the master node. On **server**:
 
