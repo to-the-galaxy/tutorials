@@ -3,7 +3,7 @@
 **Highlights**
 
 * Ubuntu server with fixed ip-address of 192.168.100.101 (prerequisite)
-* Install K3s on the server (just a master node)
+* Install K3s on the master node server (just refered to as "server" below)
 * Setup a cluster
 * Install PiHole on the K3s cluster
 
@@ -24,53 +24,69 @@ Install K3s on the master node.
 [server] $ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=192.168.100.101 --flannel-iface=ens18 --write-kubeconfig-mode=644" sh -
 ```
 
-To install K3s worker nodes.
+To install K3s worker nodes (refered to just as "worker").
 
 ```bash
 # Get K3s-token
 [server] $ sudo cat /var/lib/rancher/k3s/server/node-token
+
 # Log on the worker node and get ip and ethernet adapter
-[worker-node] $ ip addr
+[worker] $ ip addr
+
 # Use token in command for the worker node 1:
-[worker-node] $ ip addr
+[worker] $ ip addr
+
 # Use information in this script
-[worker-node] $ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=<ip-addr-of-worker-node> --flannel-iface=eth1" K3S_URL=https://<ip-addr-of-master-node>:6443 K3S_TOKEN=<insert-node-token-from-master-node>  sh -
+[worker] $ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-ip=<ip-addr-of-worker-node> --flannel-iface=eth1" K3S_URL=https://<ip-addr-of-master-node>:6443 K3S_TOKEN=<insert-node-token-from-master-node>  sh -
+
 # Check the network connection from the master to the work nodes (it may take time before they are provisioned)
 [server] $ ping <ip-addr-of-worker-node>
+
 # Check that the worker nodes are in the cluster
 [server] $ kubectl get nodes --watch
 ```
 
 ## Configuring `kubectl` 
 
+It is very convenient to configure `kubectl` to work on a client or host machine. In this case the cluster is running on a server (a small desktop pc), and the client is a laptop.
+
 ```bash
-# Get the configruation from the master node (cassiniVM1)
-[cassiniVM1] $ sudo cat /etc/rancher/k3s/k3s.yaml
+# Get the configruation from the master node
+[server] $ sudo cat /etc/rancher/k3s/k3s.yaml
+
 # Copy past the content to ~/.kube/config
 [laptop] $ mkdir ~/.kube
 [laptop] $ vim ~/.kube/config
-# Alternatively, after copying (appending) the content of k3s.yaml to ~/.kube/config change the pasted occurances of default to a different name, for example cassiniconfig
+
+# Alternatively, after copying (appending) the content of k3s.yaml to ~/.kube/config change the pasted occurances of default to a different name, for example cassiniconfig. This way you can configure Kubectl to manage multiple different clusters.
+
 # Now selete the cassiniconfig
 [laptop] $ kubectl config use-context cassiniconfig
+
 # Check that the nodes can be reached
 [laptop] $ kubectl get nodes
 ```
 
 ## Setup persistent storage with Longhorn
 
-The following commands are executed on the laptop
+The following commands can be executed on the **laptop** or directly on the **server**. I have chosen to use the laptop so that the yaml-files that will be generated are stored on it and can be copied easily to other projects.
 
 ```bash
-# Install Longhorn
+# Install Longhorn using the official script
 $ kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.2.3/deploy/longhorn.yaml
+
 # Check status of pods being created and run
 $ kubectl get pods --namespace longhorn-system --watch
+
 # Check status of services
 $ kubectl -n longhorn-system get svc
-# Create auth-file
+
+# Create authentication-file called auth (no extension)
 $ USER=michael; PASSWORD=michael; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> auth
-# Create secret from auth-file
+
+# Create secret from the auth-file
 $ kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
+
 # Create an ingress for Longhorn
 $ cat > longhorn-ingress.yaml <<EOL
 apiVersion: networking.k8s.io/v1
@@ -96,9 +112,12 @@ spec:
             port:
               number: 80
 EOL
+
 # Apply the ingress
 $ kubectl -n longhorn-system apply -f longhorn-ingress.yaml
-# Longhorn is now reachable on 192.168.56.10:80
+
+# Test that Longhorn is running
+$ curl <ip-of-master-node>:80
 ```
 
 ## Pihole-installation
