@@ -108,13 +108,13 @@ kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.2.3/depl
 Check status of pods being created and run:
 
 ```
-$ kubectl get pods --namespace longhorn-system --watch
+kubectl get pods --namespace longhorn-system --watch
 ```
 
 Check status of services:
 
 ```
-$ kubectl -n longhorn-system get svc
+kubectl -n longhorn-system get svc
 ```
 
 Create authentication-file called auth (no extension):
@@ -132,7 +132,7 @@ kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
 Create an ingress yaml-file for Longhorn:
 
 ```
-$ cat > longhorn-ingress.yaml <<EOL
+cat > longhorn-ingress.yaml <<EOL
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -407,5 +407,5 @@ kubectl exec -it <name-of-pihole-pod> -- bash
 Run this command and follow the guide to change the password, while in the pod shell:
 
 ```bash
-$ sudo pihole -a -p
+sudo pihole -a -p
 ```
