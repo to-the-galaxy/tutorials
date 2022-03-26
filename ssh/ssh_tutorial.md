@@ -16,7 +16,7 @@ ssh-keygen -t rsa -b 4096
 sh-keygen -t ed25519
 
 # Copy public key to server
-ssh-copy-id -i ~/.ssh/id_rsa <user>@<ip-address>
+ssh-copy-id -i ~/.ssh/id_rsa.pub <user>@<ip-address>
 ```
 
 ## Logon server using ssh
