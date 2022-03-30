@@ -54,5 +54,11 @@ sudo kubeadm init --apiserver-advertise-address=192.168.100.120 --pod-network-ci
 ```
 
 
+## Some troubleshooting
 
+I had troubles running `kubeadm init ...`, and tried some of these steps:
+
+* Make sure that swap is off (`swapoff -a` and comment it out in the `/etc/fstab`, then reboot).
+
+* 
 
