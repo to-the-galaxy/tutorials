@@ -1,0 +1,53 @@
+# Info: This is a who-am-I sample, that deploys a pod (one replica), called
+# "whoami", a service of type ClusterIP called "whoami-svc", and  another service
+# of type LoadBalancer called "whoami-svc-lb".
+#
+# This file is based on the following sources:
+# * https://github.com/traefik-workshops/traefik-workshop/tree/master/exercise-3
+# * https://github.com/traefik-workshops/traefik-workshop/tree/master/exercise-4
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: whoami
+  name: whoami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      containers:
+        - image: traefik/whoami:latest
+          imagePullPolicy: IfNotPresent
+          name: whoami
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: whoami
+  ports:
+    - port: 80
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami-svc-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: whoami
+  ports:
+    - port: 80
+      name: http
+      targetPort: 80
