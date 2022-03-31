@@ -1,4 +1,4 @@
-# Full Kubernetes install and setup
+# Kubernetes install and setup
 
 Install **dependencies**:
 
