@@ -10,6 +10,7 @@ Create four servers on proxmox, i.e. on the same physical machine. In this case 
 | master node | k8smaster1  |  192.168.100.124 |  k8smaster1.proxmox.home |
 | master node | k8smaster2 |  192.168.100.195 |  k8smaster2.proxmox.home |
 |  worker node | k8sworker1 |  192.168.100.118 |  k8sworker1.proxmox.home |
+| cidr | | 10.0.0.0/16 | | 
 
 After creation:
 
@@ -113,6 +114,9 @@ next
 next
 
 
+
+
+
 ```bash
 {
     sudo apt update
@@ -123,7 +127,70 @@ next
     sudo apt install -y kubectl
     kubectl version --client --output=yaml
     sudo snap install kubeadm --classic
+    sudo snap install kubelet --classic
+    sudo apt install socat
+    sudo apt install conntrack
 }
 ```
 
+
+```bash
+{
+    sudo su
+    
+}
+{
+    apt update
+    apt install -y apt-transport-https
+    apt install -y ca-certificates curl
+    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add
+    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" >> ~/kubernetes.list
+    sudo mv ~/kubernetes.list /etc/apt/sources.list.d
+    apt install kubeadm
+}
+    
+    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+    sudo apt update
+    sudo apt install -y kubectl
+    kubectl version --client --output=yaml
+    sudo snap install kubeadm --classic
+    sudo snap install kubelet --classic
+    sudo apt install socat
+    sudo apt install conntrack
+}
+```
+
+
 Obs `kubectl cluster-info` will not be working yet, becuase the cluster has not been set up - only its 
+
+
+# On one a master node (k8smaster1)
+
+```bash
+kubeadm init --control-plane-endpoint="192.168.100.102:6443" --upload-certs --apiserver-advertise-address=192.168.100.124 --pod-network-cidr=10.0.0.0/16
+```
+
+
+
+# ...
+
+```
+sudo apt install apt-transport-https curl -y
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" >> ~/kubernetes.list
+sudo mv ~/kubernetes.list /etc/apt/sources.list.d
+sudo apt update
+sudo apt install -y kubelet kubeadm kubectl kubernetes-cni
+
+
+kubeadm init --control-plane-endpoint="192.168.100.102:6443" --upload-certs --apiserver-advertise-address=192.168.100.124 --pod-network-cidr=10.244.0.0/16
+
+kubeadm init --upload-certs --pod-network-cidr=10.244.0.0/16
+
+
+
+kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+```
+
+
