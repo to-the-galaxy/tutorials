@@ -56,6 +56,20 @@ Restart and check `haproxy`:
 }
 ```
 
+Sysctl for K8s networking
+
+```bash
+{
+    sudo cat >>/etc/sysctl.d/kubernetes.conf<<EOF
+    net.bridge.bridge-nf-call-ip6tables = 1
+    net.bridge.bridge-nf-call-iptables = 1
+    EOF
+    sudo sysctl --system
+}
+```
+
+
+
 ## Basic setup of all master and worker nodes
 
 Disable firewall, turn off swap, and remove swap from fstab:
@@ -71,3 +85,45 @@ Disable firewall, turn off swap, and remove swap from fstab:
 
 next
 
+
+
+Sysctl for K8s networking
+
+```bash
+{
+    sudo cat >>/etc/sysctl.d/kubernetes.conf<<EOF
+    net.bridge.bridge-nf-call-ip6tables = 1
+    net.bridge.bridge-nf-call-iptables = 1
+    EOF
+    sudo sysctl --system
+}
+```
+
+next
+
+```bash
+{
+  apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  apt update && apt install -y docker-ce containerd.io
+  apt update && apt install -y kubernetes
+```
+
+next
+
+
+```bash
+{
+    sudo apt update
+    sudo apt install -y apt-transport-https ca-certificates curl
+    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+    sudo apt update
+    sudo apt install -y kubectl
+    kubectl version --client --output=yaml
+    sudo snap install kubeadm --classic
+}
+```
+
+Obs `kubectl cluster-info` will not be working yet, becuase the cluster has not been set up - only its 
