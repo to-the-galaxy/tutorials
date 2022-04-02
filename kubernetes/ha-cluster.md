@@ -46,3 +46,12 @@ backend kubernetes-backend
     server k8smaster1 192.168.100.124:6443 check fall 3 rise 2
     server k8smaster2 192.168.100.195:6443 check fall 3 rise 2
 ```
+
+Restart and check `haproxy`:
+
+```bash
+{
+    sudo systemctl restart haproxy
+    sudo systemctl status haproxy
+}
+```
