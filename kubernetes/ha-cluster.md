@@ -169,37 +169,41 @@ Obs `kubectl cluster-info` will not be working yet, becuase the cluster has not 
 
 
 ```bash
-{
-    sudo ufw disable
-    sudo swapoff -a;
-    sudo sed -i '/swap/d' /etc/fstab
-    cat /etc/fstab
-}
+# General update
+apt update
+apt upgrade
+
+# Disable firewall    
+ufw disable
+
+# Disable swap
+swapoff -a
+sed -i '/swap/d' /etc/fstab
+cat /etc/fstab
 
 # Remove old versions
 apt remove docker docker-engine docker.io containerd runc
 
-apt-get install ca-certificates curl gnupg lsb-release
+# Install prerequsite packages
+apt install ca-certificates curl gnupg lsb-release apt-transport-https -y
 
+# Docker/containerd
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  
 apt update
+apt install docker-ce docker-ce-cli containerd.io -y
 
-apt install install docker-ce docker-ce-cli containerd.io
-
-
-
+# Containerd.conf
 cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
 overlay
 br_netfilter
 EOF
 
-sudo modprobe overlay
-sudo modprobe br_netfilter
+# Modprobe
+modprobe overlay
+modprobe br_netfilter
 
 # Setup required sysctl params, these persist across reboots.
 cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
@@ -209,35 +213,14 @@ net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
 # Apply sysctl params without reboot
-sudo sysctl --system
+sysctl --system
 
-
-
-
-{
-    sudo cat >>/etc/sysctl.d/kubernetes.conf<<EOF
-    net.bridge.bridge-nf-call-ip6tables = 1
-    net.bridge.bridge-nf-call-iptables = 1
-    EOF
-    sudo sysctl --system
-}
-
-
-{
-    sudo su
-    
-}
-{
-    apt update
-    apt install -y apt-transport-https
-    apt install -y apt-transport-https
-    apt install -y ca-certificates curl
-    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add
-    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" >> ~/kubernetes.list
-    sudo mv ~/kubernetes.list /etc/apt/sources.list.d
-    apt install kubeadm
-}
-
+# Kubernetes
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" >> ~/kubernetes.list
+mv ~/kubernetes.list /etc/apt/sources.list.d
+apt update
+apt install kubeadm -y
 ```
 
 
