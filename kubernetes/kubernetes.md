@@ -124,3 +124,73 @@ I had troubles running `kubeadm init ...`, and tried some of these steps:
 * `rm -rf /var/lib/etcd`
 * Kill process responsible for open ports that Kubernetes might complain about ` netstat -nlpt|grep :10250` where 10250 is the portnumber (change as needed).
 
+
+
+
+
+
+
+```
+michael@cassini:~/temp$ helm install myingress ingress-nginx/ingress-nginx -n ingress-nginx --values ingress-nginx.yaml
+NAME: myingress
+LAST DEPLOYED: Fri Apr  1 22:13:55 2022
+NAMESPACE: ingress-nginx
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+The ingress-nginx controller has been installed.
+It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status by running 'kubectl --namespace ingress-nginx get services -o wide -w myingress-ingress-nginx-controller'
+
+An example Ingress that makes use of the controller:
+  apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    name: example
+    namespace: foo
+  spec:
+    ingressClassName: nginx
+    rules:
+      - host: www.example.com
+        http:
+          paths:
+            - pathType: Prefix
+              backend:
+                service:
+                  name: exampleService
+                  port:
+                    number: 80
+              path: /
+    # This section is only required if TLS is to be enabled for the Ingress
+    tls:
+      - hosts:
+        - www.example.com
+        secretName: example-tls
+
+If TLS is enabled for the Ingress, a Secret containing the certificate and key must also be provided:
+
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: example-tls
+    namespace: foo
+  data:
+    tls.crt: <base64 encoded cert>
+    tls.key: <base64 encoded key>
+  type: kubernetes.io/tls
+
+
+
+michael@cassini:~/temp$ kubectl -n ingress-nginx get all
+NAME                                           READY   STATUS    RESTARTS   AGE
+pod/myingress-ingress-nginx-controller-6lz48   1/1     Running   0          3m2s
+
+NAME                                                   TYPE           CLUSTER-IP       EXTERNAL-IP       PORT(S)                      AGE
+service/myingress-ingress-nginx-controller             LoadBalancer   10.107.192.253   192.168.100.240   80:32336/TCP,443:30910/TCP   3m2s
+service/myingress-ingress-nginx-controller-admission   ClusterIP      10.101.229.100   <none>            443/TCP                      3m2s
+
+NAME                                                DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+daemonset.apps/myingress-ingress-nginx-controller   1         1         1       1            1           kubernetes.io/os=linux   3m2s
+
+```
