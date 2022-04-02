@@ -55,3 +55,19 @@ Restart and check `haproxy`:
     sudo systemctl status haproxy
 }
 ```
+
+## Basic setup of all master and worker nodes
+
+Disable firewall, turn off swap, and remove swap from fstab:
+
+```bash
+{
+    sudo ufw disable
+    sudo swapoff -a;
+    sudo sed -i '/swap/d' /etc/fstab
+    cat /etc/fstab
+}
+```
+
+next
+
