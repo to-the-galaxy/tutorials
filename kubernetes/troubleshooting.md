@@ -128,3 +128,22 @@ ExecStart=/usr/local/bin/k3s \
 ## Worker nodes not being discovered by the master
 
 Sometimes it helps to ping the worknodes from the master node.
+
+
+
+...
+
+..
+
+...
+
+...
+
+make sure correct config maps is available
+
+
+
+Good troubleshooting guide: https://jhooq.com/nginx-ingress-controller-crashloopbackoff-error/
+
+
+
