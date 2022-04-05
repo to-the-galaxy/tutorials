@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-example
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: test.proxmox.home
+      http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: whoami-svc
+                port:
+                  number: 80
+            path: /
