@@ -1,0 +1,18 @@
+# Notice: The ip-range must be in the same subnet as node. In this case the
+# node is on a fixed ip address of 192.168.100.120 in the subnet of 
+# 255.255.255.0. The DHCP server (my router) is set to not hand out ip 
+# addresses in the range specified in this yaml.
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.49.240-192.168.49.250
+
