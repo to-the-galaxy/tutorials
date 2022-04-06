@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website-simple
+  labels:
+    app: website-simple
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: website-simple
+  template:
+    metadata:
+      labels:
+        app: website-simple
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html-volume
+        configMap:
+          name: website-simple-html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: website-simple-service
+spec:
+  selector:
+    app: website-simple
+  ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: website-simple-html
+  namespace: default
+data:
+  index.html: |-
+    <html>
+    <head><title>Simple website</title>
+      <style>
+        html {
+          font-size: 62.5%;
+        }
+        body {
+          font-family: sans-serif;
+          background-color: rgb(80, 80, 200);
+          color: white;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          height: 100vh;
+        }
+        div {
+          text-align: center;
+          font-size: 8rem;
+          text-shadow: 3px 3px 4px dimgrey;
+        }
+      </style>
+    </head>
+    <body>
+      <div>Hello from a simple website!</div>
+    </body>
+    </html>

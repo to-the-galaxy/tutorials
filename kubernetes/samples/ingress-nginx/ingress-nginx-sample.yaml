@@ -1,17 +1,19 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-whoami
+  name: ingress-website-simple
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - host: test.proxmox.home
     http:
       paths:
-      - path: /
+      - path: /simple
         pathType: Exact
         backend:
           service:
-            name: whoami-svc
+            name: website-simple-service
             port:
               number: 80
   ingressClassName: nginx
