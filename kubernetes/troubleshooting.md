@@ -1,4 +1,45 @@
-# Troubleshooting
+# Troubleshooting tips
+
+**Kubeadm** fails running`init` or `join`
+
+```bash
+# Error: Port 10250 is in use
+# Get process keeping the port active and kill it
+sudo netstat -tulpn | grep kubelet
+sudo kill <process-id>
+
+# Error: /etc/kubernetes/kubelet.conf already exists or /etc/kubernetes/pki/ca.crt already exists
+sudo rm -rf /etc/kubernetes
+
+# Perform a reset
+kubeadm reset -f
+```
+
+**crisocket**
+
+```bash
+# Error execution phase kubelet-start: error uploading crisocket: Unauthorized
+# Try
+cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF
+sysctl --system
+
+# Check that docker and kubelet is both enabled and running (active)
+systemctl status docker
+systemctl status kubelet
+
+# Systemctl daemond may need a restart
+systemctl daemon-restart
+systemctl start docker
+systemctl start kubelet
+```
+
+See this [stackoverflow](https://stackoverflow.com/questions/66816932/worker-node-joining-error-error-execution-phase-kubelet-start-error-uploading).
+
+
 
 Some troubleshooting that I had to do.
 
