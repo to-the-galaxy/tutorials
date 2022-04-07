@@ -8,6 +8,9 @@
 * [vagrant](vagrant/vagrant_tutorial.md)
 * [git](git/git_tutorial.md)
 * [Docker](docker/docker_ubuntu_tutorial.md)
+* [Kubernetes](kubernetes/readme.md)
+
+
 
 **Kubernetes (the K3s-distribution)**
 
