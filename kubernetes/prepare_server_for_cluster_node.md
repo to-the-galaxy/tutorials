@@ -1,6 +1,6 @@
 ## Prepare server for a cluster node
 
-...
+This process is needed on Ubuntu 20.24-servers for both master and worker nodes.
 
 ```bash
 sudo su
