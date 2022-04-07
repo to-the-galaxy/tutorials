@@ -4,7 +4,7 @@
 
 ```bash
 # Error: Port 10250 is in use
-# Get process keeping the port active and kill it
+# Get process keeping the port active and kill it (netstat is in the net-tools package)
 sudo netstat -tulpn | grep kubelet
 sudo kill <process-id>
 
