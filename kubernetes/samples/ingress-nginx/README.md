@@ -3,7 +3,7 @@
 Install instructions from [community GitHub](https://kubernetes.github.io/ingress-nginx/deploy/) using Helm:
 
 ```bash
-helm upgrade --install ingress-nginx ingress-nginx \
+helm upgrade --install my-ingress-nginx ingress-nginx \
   --repo https://kubernetes.github.io/ingress-nginx \
   --namespace ingress-nginx --create-namespace
 ```
