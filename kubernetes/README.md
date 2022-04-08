@@ -1,6 +1,6 @@
 # Kubernetes (K8s)
 
-Basic Kubernetes (K8s) tutorials and cheat sheets:
+Basic setup of a Kubernetes (K8s) cluster:
 
 * [High availability Kubernetes cluster](ha-kubernetes-cluster.md)
 * [HAproxy loadbalancer](HAproxy_loadbalancer.md)
@@ -8,3 +8,7 @@ Basic Kubernetes (K8s) tutorials and cheat sheets:
 * [Prepar a server for a cluster node](prepare_server_for_cluster_node.md)
 * [Troubleshooting tips](troubleshooting.md)
 
+Other tutorials
+
+* [Kubectl](kubectl) - cheat sheet for `kubectl`
+* [Helm](helm) - a package manager for Kubernetes

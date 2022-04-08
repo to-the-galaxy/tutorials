@@ -20,3 +20,11 @@ Install with a different release name:
 helm install my-prometheus prometheus-community/kube-prometheus-stack
 ```
 
+...
+
+...
+
+```bash
+kubectl apply --kustomize github.com/kubernetes/ingress-nginx/deploy/grafana/
+```
+
