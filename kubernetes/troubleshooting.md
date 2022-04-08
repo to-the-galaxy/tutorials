@@ -39,7 +39,15 @@ systemctl start kubelet
 
 See this [stackoverflow](https://stackoverflow.com/questions/66816932/worker-node-joining-error-error-execution-phase-kubelet-start-error-uploading).
 
+**Webhook and ingress**: Internal error occurred: failed calling webhook "validate.nginx.ingress.kubernetes.io"
 
+```bash
+# Get webhooks
+kubectl get validatingwebhookconfigurations
+
+# Delete webhooks (one at the time)
+kubectl delete validatingwebhookconfigurations <webhook-name>
+```
 
 Some troubleshooting that I had to do.
 
