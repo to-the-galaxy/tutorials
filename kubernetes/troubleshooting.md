@@ -49,6 +49,12 @@ kubectl get validatingwebhookconfigurations
 kubectl delete validatingwebhookconfigurations <webhook-name>
 ```
 
+**Ingress problems**
+
+* Always check the `host` value in the ingress yaml-file.
+* Check port of the service needed.
+* If using a loadbalancer, check how it is configured.
+
 Some troubleshooting that I had to do.
 
 ## Kubectl command list
