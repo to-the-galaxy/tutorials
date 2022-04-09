@@ -72,6 +72,11 @@ echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" >> ~/kubernetes.lis
 mv ~/kubernetes.list /etc/apt/sources.list.d
 apt update
 apt install kubeadm -y
+
+#### Additional considerations ####
+# If you are going to use Longhorn
+sudo apt install open-iscsi
+sudo apt install bash curl findmnt grep, awk blkid lsblk
 ```
 
 ## 
