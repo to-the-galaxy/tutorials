@@ -9,8 +9,8 @@ spec:
   - host: new.server.local # test.proxmox.home
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - path: /whoami
+        pathType: Exact
         backend:
           service:
             name: whoami-svc
