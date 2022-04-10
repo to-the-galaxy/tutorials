@@ -1,4 +1,5 @@
 # Adding persistent storage claim
+# This will generate persistent volume and a persistent volume claim
 prometheus:
   server:
     persistentVolume:
@@ -10,4 +11,4 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 10Gi
+              storage: 4Gi

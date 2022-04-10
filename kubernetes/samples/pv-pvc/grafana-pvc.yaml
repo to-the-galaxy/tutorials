@@ -1,0 +1,16 @@
+# This requires a persistent volume called grafana-volume
+# created in longhorn
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prom-grafana-pvc
+  # namespace: longhorn
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: grafana
+  volumeMode: Filesystem
+  volumeName: grafana-volume # pvc-prom-grafana-0

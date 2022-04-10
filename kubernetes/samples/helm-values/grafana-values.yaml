@@ -1,0 +1,7 @@
+grafana:
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    type: pvc
+    enabled: true
+    existingClaim: prom-grafana-pvc

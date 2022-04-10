@@ -5,6 +5,7 @@ A package manager for kubernetes.
 ```bash
 # List installed charts
 helm list
+helm list -a
 
 # Delete chart/release
 helm delete <name-of-chart-or-release>
