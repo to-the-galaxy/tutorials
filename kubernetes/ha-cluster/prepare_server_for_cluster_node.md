@@ -26,8 +26,7 @@ apt install ca-certificates curl gnupg lsb-release apt-transport-https -y
 # Docker/containerd
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 apt update
 apt install docker-ce docker-ce-cli containerd.io -y
 
@@ -70,13 +69,17 @@ sysctl --system
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" >> ~/kubernetes.list
 mv ~/kubernetes.list /etc/apt/sources.list.d
-apt update
-apt install kubeadm -y
+apt update && apt install kubeadm -y
 
 #### Additional considerations ####
 # If you are going to use Longhorn
 sudo apt install open-iscsi
 sudo apt install bash curl findmnt grep, awk blkid lsblk
+
+# If you are going to use Helm
+# Requires apt-transport-https (installed above)
+curl https://baltocdn.com/helm/signing.asc | apt-key add -
+echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
+apt update && apt install helm -y
 ```
 
-## 
