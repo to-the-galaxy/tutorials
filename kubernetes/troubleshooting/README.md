@@ -57,6 +57,12 @@ kubectl delete validatingwebhookconfigurations <webhook-name>
 
 Some troubleshooting that I had to do.
 
+**Warning** regarding kubernetes configuration file being group-readable and/or world-readable.
+
+```bash
+chmod go-r ~/.kube/config
+```
+
 ## Kubectl command list
 
 ```bash
