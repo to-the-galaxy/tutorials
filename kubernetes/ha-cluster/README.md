@@ -20,5 +20,6 @@ The setting up of the cluster involves the following **overall steps and process
    * Setup required `sysctl` params for `/etc/sysctl.d/99-kubernetes-cri.conf`
    * Add Kubernetes repository to the package manager
    * Install `kubeadm`
+   * Install `helm`
 4. [**Initialise** and **join nodes**](initialize_join_nodes.md)  with `kubeadm init` and `kubeadm join`
 5. Now **just use the cluster** for what you need
