@@ -2,7 +2,22 @@
 
 **Initialize**
 
-...
+```bash
+kubeadm init --control-plane-endpoint="192.168.100.102:6443" --upload-certs --apiserver-advertise-address=192.168.100.124 --pod-network-cidr=10.244.0.0/16
+```
+
+**Important** the cluster will be initialized with **taints** on master nodes preventing scheduling of nodes. To schedule pods on master nodes these must be removed.
+
+```bash
+kubectl describe node <name-of-master-node> | grep taints -i -A 3
+kubectl taint nodes <node-name> <key>:<value>-
+```
+
+**Install Flannel** to create network overlay (with out Flannel or other service CoreDNS will not work):
+
+```bash
+kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml
+```
 
 **Join a master**
 
@@ -87,3 +102,5 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
 ...
+
+kubeadm init --control-plane-endpoint="192.168.100.96:6443" --upload-certs --apiserver-advertise-address=192.168.100.96 --pod-network-cidr=10.244.0.0/16
