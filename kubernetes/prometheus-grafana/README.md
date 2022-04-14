@@ -4,17 +4,11 @@ Update repository and charts:
 
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo list
 helm repo update
 ```
 
-Install:
-
-```bash
-helm install prometheus prometheus-community/kube-prometheus-stack
-```
-
-Install with a different release name:
+Install with a any release name (here "my-prometheus":
 
 ```bash
 helm install my-prometheus prometheus-community/kube-prometheus-stack
@@ -72,4 +66,22 @@ kubectl get secret my-prometheus-grafana -o jsonpath="{.data.admin-password}" | 
 
 ## To-do
 
-* Create and provision persistent storage for prometheus and grafana, for example with Longhorn.
+* Create and provision persistent storage for prometheus and grafana, for example with Longhorn.'
+
+
+
+Create a values-yaml with this content to create a sidecar that looks for configmaps:
+
+```
+sidecar:
+  dashboards:
+    # To enable sidecar
+    enabled: true
+    # Label key that configMaps should have in order to be mounted 
+    label: grafana_dashboard
+    # Folder where the configMaps are mounted in Grafana container
+    folder: /tmp/dashboards
+    # To enable searching configMap accross all namespaces
+    searchNamespace: ALL
+```
+
