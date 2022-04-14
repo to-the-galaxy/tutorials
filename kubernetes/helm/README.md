@@ -20,4 +20,8 @@ helm get values <release_name> <flags>
 # Examples
 helm get values my-longhorn -n longhorn-system -o yaml
 helm get values my-longhorn -n longhorn-system --all -o yaml
+
+# Helm upgrade release
+helm upgrade [RELEASE] [CHART] [flags]
+helm upgrade my-prometheus prometheus-community/kube-prometheus-stack -f prometheus-pv-pvc.yaml
 ```
