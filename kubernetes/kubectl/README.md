@@ -44,4 +44,14 @@ kubectl taint nodes <node-name> <value>:<taint>
 # Remove taint
 kubectl taint nodes  <node-name> key1=value1:NoSchedule-
 kubectl taint nodes <node-name> <value>:<taint>-
+
+# Remove all evicted pods in default namespace
+kubectl get pod | grep Evicted | awk '{print $1}' | xargs kubectl delete pod
+
+# Remove all pods with status of ExitCode, Evicted, ContainerStatusUnknow, Error, Completed
+kubectl get pod | grep 'ExitCode\|Evicted\|ContainerStatusUnknown\|Error\|Completed' | awk '{print $1}' | xargs kubectl delete pod
+
+# Remove all pods in specific namespace with status of ExitCode, Evicted, ContainerStatusUnknow, Error, Completed
+kubectl get pod -n longhorn-system | grep 'ExitCode\|Evicted\|ContainerStatusUnknown\|Error\|Completed' | awk '{print $1}' | xargs kubectl delete pod -n longhorn-system
+
 ```
