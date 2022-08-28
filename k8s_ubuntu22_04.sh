@@ -2,19 +2,30 @@
 
 echo "Ready to start!!!"
 echo "Specify some settings for Kubernetes:"
-echo "Provide value for --control-plane-endpoints (default is 192.168.100.101). Don't specify port (script uses default)"
+
+default_ip=$(ip addr show $(ip route | awk '/default/ { print $5 }') | grep "inet" | head -n 1 | awk '/inet/ {print $2}' | cut -d'/' -f1)
+
+echo "Provide base ip address of server (default is $default_ip)."
+read input_base_ip
+if [ -z "$input_base_ip" ]
+then
+    var_base_ip="$default_ip"
+else
+	var_base_ip=$input_base_ip
+fi
+echo "Provide value for --control-plane-endpoints (default is $var_base_ip). Don't specify port (script uses default)"
 read input_control_plane_endpoint
 if [ -z "$input_control_plane_endpoint" ]
 then
-    var_control_plane_endpoint="192.168.100.101"
+    var_control_plane_endpoint="$var_base_ip"
 else
 	var_control_plane_endpoint=$input_control_plane_endpoint
 fi
-echo "Provide value for --apiserver-advertise-address (default is 192.168.100.101)"
+echo "Provide value for --apiserver-advertise-address (default is $var_base_ip)"
 read input_api_server_address
 if [ -z "$input_api_server_address" ]
 then
-    var_api_server_address="192.168.100.101"
+    var_api_server_address="$var_base_ip"
 else
 	var_api_server_address=$input_api_server_address
 fi
@@ -26,11 +37,16 @@ then
 else
 	var_pod_network=$input_pod_network
 fi
-echo "Provide value ip range for Metallb to hand out ip addresses at (default is 192.168.100.200-192.168.100.210)"
+
+var_metallb_ip=$(echo $var_base_ip | awk -F . '{printf $1"."$2"."$3}')
+var_metallb_ip1="$var_metallb_ip.240"
+var_metallb_ip2="$var_metallb_ip.245"
+
+echo "Provide value ip range for Metallb to hand out ip addresses at (default is $var_metallb_ip1-$var_metallb_ip2)"
 read input_pod_network
 if [ -z "$input_metallb_ip_range" ]
 then
-    var_metallb_ip_range="192.168.100.200-192.168.100.210"
+    var_metallb_ip_range="$var_metallb_ip1-$var_metallb_ip2"
 else
 	var_metallb_ip_range=$input_metallb_ip_range
 fi
@@ -49,7 +65,7 @@ then
 	printf "\nAborting!!!\n "
     exit
 fi
-
+echo ""
 echo "** Task == apt update"
  
 # apt update and send stdout (1) to /dev/null, and send stderr (2) to the same as stdout
@@ -346,6 +362,7 @@ spec:
   - first-pool
 EOF
 
+sleep 3
 kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml
 
 var_metallb_status=$?
@@ -355,7 +372,7 @@ then
 	sleep 5
 	kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml
 	var_metallb_status=$?
-	if [ $? -ne 0]
+	if [ $? -ne 0 ]
 	then
 		sleep 5
 		kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml
@@ -363,12 +380,12 @@ then
 	fi
 fi
 
-if [ $var_metallb_status -ne 0 ] then echo "Problems running: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml"
-
-mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
-
+if [ $var_metallb_status -eq 0 ]
+then
+    echo "Success apply metallb-settings"
+else
+    echo "Problems applying metallb-settings. Try to run 'kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml' manually"
+fi
 
 echo "Setup kubectl for a specific user"
 echo "Enter user name"
@@ -378,10 +395,10 @@ echo "Var: $var/.kube"
 mkdir -p /home/$var_user/.kube
 if [ $? -eq 0 ]
    then
-	echo  "Created folder: /home/$var_user/.kube"
+       echo "Created folder: /home/$var_user/.kube"
    else
-       echo "Could not create /home/$var_user/.kubei"
+       echo "Could not create /home/$var_user/.kube"
 fi
 
 cp -i /etc/kubernetes/admin.conf /home/$var_user/.kube/config
-chown $(id -u $var_user):$(id -g $var_user) /home/$var_user/.kube/config
+sudo chown $(id -u $var_user):$(id -g $var_user) /home/$var_user/.kube/config
