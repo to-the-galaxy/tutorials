@@ -363,7 +363,7 @@ then
 	fi
 fi
 
-if [ $var_metallb_status -ne 0 ] then echo "Problems running: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml" fi
+if [ $var_metallb_status -ne 0 ] then echo "Problems running: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml"
 
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
