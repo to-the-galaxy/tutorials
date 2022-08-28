@@ -2,19 +2,19 @@
 
 echo "Ready to start!!!"
 echo "Specify some settings for Kubernetes:"
-echo "Provide value for --control-plane-endpoints (default is 192.168.56.101). Don't specify port (script uses default)"
+echo "Provide value for --control-plane-endpoints (default is 192.168.100.101). Don't specify port (script uses default)"
 read input_control_plane_endpoint
 if [ -z "$input_control_plane_endpoint" ]
 then
-    var_control_plane_endpoint="192.168.56.101"
+    var_control_plane_endpoint="192.168.100.101"
 else
 	var_control_plane_endpoint=$input_control_plane_endpoint
 fi
-echo "Provide value for --apiserver-advertise-address (default is 192.168.56.101)"
+echo "Provide value for --apiserver-advertise-address (default is 192.168.100.101)"
 read input_api_server_address
 if [ -z "$input_api_server_address" ]
 then
-    var_api_server_address="192.168.56.101"
+    var_api_server_address="192.168.100.101"
 else
 	var_api_server_address=$input_api_server_address
 fi
@@ -26,11 +26,11 @@ then
 else
 	var_pod_network=$input_pod_network
 fi
-echo "Provide value ip range for Metallb to hand out ip addresses at (default is 192.168.56.200-192.168.56.210)"
+echo "Provide value ip range for Metallb to hand out ip addresses at (default is 192.168.100.200-192.168.100.210)"
 read input_pod_network
 if [ -z "$input_metallb_ip_range" ]
 then
-    var_metallb_ip_range="192.168.56.200-192.168.56.210"
+    var_metallb_ip_range="192.168.100.200-192.168.100.210"
 else
 	var_metallb_ip_range=$input_metallb_ip_range
 fi
@@ -43,13 +43,12 @@ echo "   spec:"
 echo "     addresses:"
 echo "     - $var_metallb_ip_range"
 
-read -p "Continue ?" -n 1 -r
+read -p "Continue ? " -n 1 -r
 if [[ $REPLY =~ ^[Nn]$ ]]
 then
-	echo "Aborting!!!\n"
+	printf "\nAborting!!!\n "
     exit
 fi
-
 
 echo "** Task == apt update"
  
@@ -296,22 +295,30 @@ echo "** Task == kubeadm init"
 
 
 
-echo "Summary for kubeadm init:"
-echo "   --control-plane-endpoint=$var_control_plane_endpoint:6443"
-echo "   --apiserver-advertise-address=$var_api_server_address"
-echo "   --pod-network-cidr=$var_pod_network"
-echo "Summary for metallb"
-echo "   spec:"
-echo "     addresses:"
-echo "     - $var_metallb_ip_range"
+#echo "Summary for kubeadm init:"
+#echo "   --control-plane-endpoint=$var_control_plane_endpoint:6443"
+#echo "   --apiserver-advertise-address=$var_api_server_address"
+#echo "   --pod-network-cidr=$var_pod_network"
+#echo "Summary for metallb"
+#echo "   spec:"
+#echo "     addresses:"
+#echo "     - $var_metallb_ip_range"
 
 
 
-echo "Task ===> init cluster"
 kubeadm init \
   --control-plane-endpoint="$var_control_plane_endpoint:6443" \
   --apiserver-advertise-address="$var_api_server_address" \
   --pod-network-cidr="$var_pod_network"
+var_err=$?
+if [ $var_err -eq 0 ]; then echo "   OK = kubeadm init succeded"; else echo "   Error = kubeadm init unsuccessful"; fi
+read -p "Continue ? " -n 1 -r
+if [[ $REPLY =~ ^[Nn]$ ]]
+then
+    printf "Aborting!!!\n"
+    exit
+fi
+
 
 kubectl --kubeconfig=/etc/kubernetes/admin.conf taint nodes --all node-role.kubernetes.io/control-plane- node-role.kubernetes.io/master-
 
@@ -341,3 +348,40 @@ EOF
 
 kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml
 
+var_metallb_status=$?
+
+if [ $var_metallb_status -ne 0 ]
+then
+	sleep 5
+	kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml
+	var_metallb_status=$?
+	if [ $? -ne 0]
+	then
+		sleep 5
+		kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml
+		var_metallb_status=$?
+	fi
+fi
+
+if [ $var_metallb_status -ne 0 ] then echo "Problems running: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f metallb-settings.yaml" fi
+
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+
+
+echo "Setup kubectl for a specific user"
+echo "Enter user name"
+read var_user
+echo "Var: $var/.kube"
+
+mkdir -p /home/$var_user/.kube
+if [ $? -eq 0 ]
+   then
+	echo  "Created folder: /home/$var_user/.kube"
+   else
+       echo "Could not create /home/$var_user/.kubei"
+fi
+
+cp -i /etc/kubernetes/admin.conf /home/$var_user/.kube/config
+chown $(id -u $var_user):$(id -g $var_user) /home/$var_user/.kube/config
